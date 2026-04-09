@@ -1,4 +1,4 @@
-# Kalkulator Kenaikan Gaji 2024
+# Kalkulator Kenaikan Gaji 2026
 
 Aplikasi berbasis web ini dirancang untuk menyimulasikan persentase dan nominal kenaikan gaji karyawan berdasarkan beberapa variabel yang telah ditentukan (seperti inflasi, market adjustment, faktor performa, dan level/golongan). Selain rincian kenaikan gaji pokok, aplikasi ini juga memperhitungkan *Commuting Allowance* terbaru serta *Tunjangan Jabatan* untuk memproyeksikan total Take Home Pay (THP).
 
