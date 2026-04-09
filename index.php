@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
         $gpms = 0.0;
         $gpms_factor = $_POST['gpms_factor'] ?? '';
 
-        if ($level === 'CL2') {
+        if (in_array($level, ['CL23', 'CL22', 'CL21'])) {
             switch ($gpms_factor) {
                 case 'AA': $gpms = 3.0; break;
                 case 'AB': $gpms = 2.5; break;
@@ -76,20 +76,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
         $commuting_allowance = 0;
 
         switch ($level) {
-            case 'CL2':
+            case 'CL23':
+            case 'CL22':
+            case 'CL21':
                 $adj = 0.70;
                 $commuting_allowance = 50000;
                 break;
             case 'CL1.3':
-                $adj = $adj_input;
+                $adj = 1.50;
                 $commuting_allowance = 30000;
                 break;
             case 'CL1.2':
-                $adj = $adj_input;
+                $adj = 1.25;
                 $commuting_allowance = 40000;
                 break;
             case 'CL1.1':
-                $adj = $adj_input;
+                $adj = 1.00;
                 $commuting_allowance = 20000;
                 break;
         }
@@ -97,12 +99,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
         $jabatan = $_POST['jabatan'] ?? '';
         $jabatan_allowance = 0;
         switch ($jabatan) {
-            case 'Line Captain':
-            case 'Sector Leader':
-                $jabatan_allowance = 50000;
-                break;
-            case 'Leader Shift':
+            case 'Shift leader':
                 $jabatan_allowance = 100000;
+                break;
+            case 'Sector leader':
+            case 'Line captain':
+                $jabatan_allowance = 50000;
                 break;
             case 'Part Leader':
                 $jabatan_allowance = 150000;
@@ -129,10 +131,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
         $new_salary = $current_salary + $increase_amount; // Legacy for DB if needed
 
         $levelDisplayMap = [
-            'CL2' => 'CL2.1-2-3 (TB4, TB5, TB6)',
-            'CL1.3' => 'CL1.3 (TB3)',
-            'CL1.2' => 'CL1.2 (TB2)',
-            'CL1.1' => 'CL1.1 (TB1)'
+            'CL23' => 'CL23',
+            'CL22' => 'CL22',
+            'CL21' => 'CL21',
+            'CL1.3' => 'CL13',
+            'CL1.2' => 'CL12',
+            'CL1.1' => 'CL11'
         ];
 
         $final_level = $levelDisplayMap[$level] ?? $level;
@@ -194,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Kenaikan Gaji 2024</title>
+    <title>Kalkulator Kenaikan Gaji 2026</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -277,8 +281,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
             </div>
         </div>
         <div class="text-center mb-8">
-            <h1 class="text-2xl font-medium text-google-text">Kalkulator Kenaikan Gaji</h1>
-            <p class="text-google-textSecondary mt-2">Simulasi penyesuaian gaji Anda berdasarkan rumusan perusahaan.</p>
+            <h1 class="text-2xl font-medium text-google-text">Kalkulator Kenaikan Gaji 2026</h1>
+            <p class="text-google-textSecondary mt-2">Simulasi penyesuaian gaji Anda berdasarkan pengumuman 2026.</p>
         </div>
 
         <form id="payrollForm" method="POST" action="">
@@ -303,7 +307,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                     <label
                         class="text-sm font-medium text-google-textSecondary absolute -top-2 left-3 bg-white px-1 z-10 transition-all group-focus-within:text-google-blue"
                         for="prev_commuting">
-                        Commuting Allowance Sebelumnya
+                        Tunjangan Transportasi Sebelumnya
                     </label>
                     <input type="text" id="prev_commuting" name="prev_commuting" required
                         placeholder="Contoh: 500.000"
@@ -323,10 +327,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                         <select id="level" name="level" required
                             class="w-full appearance-none bg-transparent border border-google-border px-4 py-3.5 pr-8 rounded-md hover:border-[#1f1f1f] focus:outline-none focus:border-2 focus:border-google-blue focus:py-[13px] transition-colors cursor-pointer text-google-text">
                             <option value="">Pilih Level / Golongan</option>
-                            <option value="CL2" <?= (isset($_POST['level']) && $_POST['level'] == 'CL2') ? 'selected' : '' ?>>CL2.1-2-3 (TB4, TB5, TB6)</option>
-                            <option value="CL1.3" <?= (isset($_POST['level']) && $_POST['level'] == 'CL1.3') ? 'selected' : '' ?>>CL1.3 (TB3)</option>
-                            <option value="CL1.2" <?= (isset($_POST['level']) && $_POST['level'] == 'CL1.2') ? 'selected' : '' ?>>CL1.2 (TB2)</option>
-                            <option value="CL1.1" <?= (isset($_POST['level']) && $_POST['level'] == 'CL1.1') ? 'selected' : '' ?>>CL1.1 (TB1)</option>
+                            <option value="CL23" <?= (isset($_POST['level']) && $_POST['level'] == 'CL23') ? 'selected' : '' ?>>CL23</option>
+                            <option value="CL22" <?= (isset($_POST['level']) && $_POST['level'] == 'CL22') ? 'selected' : '' ?>>CL22</option>
+                            <option value="CL21" <?= (isset($_POST['level']) && $_POST['level'] == 'CL21') ? 'selected' : '' ?>>CL21</option>
+                            <option value="CL1.3" <?= (isset($_POST['level']) && $_POST['level'] == 'CL1.3') ? 'selected' : '' ?>>CL13</option>
+                            <option value="CL1.2" <?= (isset($_POST['level']) && $_POST['level'] == 'CL1.2') ? 'selected' : '' ?>>CL12</option>
+                            <option value="CL1.1" <?= (isset($_POST['level']) && $_POST['level'] == 'CL1.1') ? 'selected' : '' ?>>CL11</option>
                         </select>
                         <div
                             class="pointer-events-none absolute w-8 bottom-0 top-0 right-0 flex items-center justify-center text-google-textSecondary">
@@ -349,9 +355,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                         <select id="jabatan" name="jabatan"
                             class="w-full appearance-none bg-transparent border border-google-border px-4 py-3.5 pr-8 rounded-md hover:border-[#1f1f1f] focus:outline-none focus:border-2 focus:border-google-blue focus:py-[13px] transition-colors cursor-pointer text-google-text">
                             <option value="">Tidak Punya Jabatan</option>
-                            <option value="Line Captain" <?= (isset($_POST['jabatan']) && $_POST['jabatan'] == 'Line Captain') ? 'selected' : '' ?>>Line Captain (+50.000)</option>
-                            <option value="Sector Leader" <?= (isset($_POST['jabatan']) && $_POST['jabatan'] == 'Sector Leader') ? 'selected' : '' ?>>Sector Leader (+50.000)</option>
-                            <option value="Leader Shift" <?= (isset($_POST['jabatan']) && $_POST['jabatan'] == 'Leader Shift') ? 'selected' : '' ?>>Leader Shift (+100.000)</option>
+                            <option value="Shift leader" <?= (isset($_POST['jabatan']) && $_POST['jabatan'] == 'Shift leader') ? 'selected' : '' ?>>Shift leader (+100.000)</option>
+                            <option value="Sector leader" <?= (isset($_POST['jabatan']) && $_POST['jabatan'] == 'Sector leader') ? 'selected' : '' ?>>Sector leader (+50.000)</option>
+                            <option value="Line captain" <?= (isset($_POST['jabatan']) && $_POST['jabatan'] == 'Line captain') ? 'selected' : '' ?>>Line captain (+50.000)</option>
                             <option value="Part Leader" <?= (isset($_POST['jabatan']) && $_POST['jabatan'] == 'Part Leader') ? 'selected' : '' ?>>Part Leader (+150.000)</option>
                             <option value="Group Leader" <?= (isset($_POST['jabatan']) && $_POST['jabatan'] == 'Group Leader') ? 'selected' : '' ?>>Group Leader (+250.000)</option>
                         </select>
@@ -390,12 +396,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                         <select id="gpms_factor" name="gpms_factor"
                             class="w-full appearance-none bg-transparent border border-google-border px-4 py-3.5 pr-8 rounded-md hover:border-[#1f1f1f] focus:outline-none focus:border-2 focus:border-google-blue focus:py-[13px] transition-colors cursor-pointer text-google-text">
                             <option value="">Tidak Punya GPMS (0%)</option>
-                            <option value="AA" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'AA') ? 'selected' : '' ?>>1 (AA)</option>
-                            <option value="AB" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'AB') ? 'selected' : '' ?>>1.5 (AB)</option>
-                            <option value="BB" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'BB') ? 'selected' : '' ?>>2 (BB)</option>
-                            <option value="BC" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'BC') ? 'selected' : '' ?>>2.5 (BC)</option>
-                            <option value="CC" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'CC') ? 'selected' : '' ?>>3 (CC)</option>
-                            <option value="CD_DD" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'CD_DD') ? 'selected' : '' ?>>4 (CD, DD)</option>
+                            <option value="AA" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'AA') ? 'selected' : '' ?>>AA</option>
+                            <option value="AB" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'AB') ? 'selected' : '' ?>>AB</option>
+                            <option value="BB" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'BB') ? 'selected' : '' ?>>BB</option>
+                            <option value="BC" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'BC') ? 'selected' : '' ?>>BC</option>
+                            <option value="CC" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'CC') ? 'selected' : '' ?>>CC</option>
+                            <option value="CD_DD" <?= (isset($_POST['gpms_factor']) && $_POST['gpms_factor'] == 'CD_DD') ? 'selected' : '' ?>>CD / DD</option>
                         </select>
                         <div
                             class="pointer-events-none absolute w-8 bottom-0 top-0 right-0 flex items-center justify-center text-google-textSecondary">
@@ -449,7 +455,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                                     <span class="font-medium"><?= number_format($result['inflasi'], 2) ?>%</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-gray-500">Market Adjustment</span>
+                                    <span class="text-gray-500">Penyesuaian</span>
                                     <span class="font-medium"><?= number_format($result['adj'], 2) ?>%</span>
                                 </div>
                                 <div class="flex justify-between">
@@ -477,7 +483,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                 <!-- Kenaikan Commuting Allowance Card -->
                 <div class="bg-white border border-gray-200 shadow-sm rounded-xl p-5 mb-4 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-1 h-full bg-[#fbbc04]"></div>
-                    <h3 class="text-sm font-bold text-google-text mb-3">2. Commuting Allowance</h3>
+                    <h3 class="text-sm font-bold text-google-text mb-3">2. Tunjangan Transportasi</h3>
                     <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-[14px]">
                         <div class="text-google-textSecondary">Lama</div>
                         <div class="text-right font-medium">Rp <?= number_format($result['prev_commuting'], 0, ',', '.') ?></div>
@@ -487,7 +493,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                         
                         <div class="col-span-2 border-b border-gray-100 my-1"></div>
                         
-                        <div class="text-google-textSecondary font-bold text-google-text">Commuting Allowance Baru</div>
+                        <div class="text-google-textSecondary font-bold text-google-text">Tunjangan Transportasi Baru</div>
                         <div class="text-right font-bold text-google-text">Rp <?= number_format($result['new_commuting'], 0, ',', '.') ?></div>
                     </div>
                 </div>
@@ -510,7 +516,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                 <div class="bg-gradient-to-br from-[#f0f4f9] to-[#ffffff] border-2 border-[#d3e3fd] rounded-xl p-6 shadow-sm text-center transform transition-transform hover:-translate-y-1 hover:shadow-md">
                     <div class="text-sm font-bold text-google-textSecondary mb-2 uppercase tracking-wide">Total Take Home Pay (THP) Baru</div>
                     <div class="text-[34px] font-black text-google-blue tracking-tight leading-none mb-2">Rp <?= number_format($result['total_thp'], 0, ',', '.') ?></div>
-                    <div class="text-xs text-google-textSecondary">(Gaji Pokok + Commuting Allowance + Tunjangan Jabatan)</div>
+                    <div class="text-xs text-google-textSecondary">(Gaji Pokok + Tunjangan Transportasi + Tunjangan Jabatan)</div>
+                    <div class="mt-3 text-[11px] text-google-blue font-medium bg-blue-50 py-1 px-3 rounded-full inline-block">Berlaku mulai 01 Januari 2026</div>
                 </div>
 
                 <div class="mt-8">
@@ -660,7 +667,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
 
             function updateVisibility() {
                 const val = levelSelect.value;
-                if (val === 'CL1.3' || val === 'CL1.2' || val === 'CL1.1') {
+                if (false && (val === 'CL1.3' || val === 'CL1.2' || val === 'CL1.1')) {
                     adjContainer.classList.remove('hidden');
                     adjInput.setAttribute('required', 'required');
                 } else {
@@ -668,7 +675,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                     adjInput.removeAttribute('required');
                 }
 
-                if (val === 'CL2' || val === 'CL1.3') {
+                if (['CL23', 'CL22', 'CL21', 'CL1.3'].includes(val)) {
                     gpmsContainer.classList.remove('hidden');
                 } else {
                     gpmsContainer.classList.add('hidden');
